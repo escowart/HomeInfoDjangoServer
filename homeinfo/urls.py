@@ -13,12 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
+from django.urls import re_path, include
+from rest_framework.routers import SimpleRouter
 
 from homeinfo.views import HomeViewSet
+
+
+router = SimpleRouter()
+router.register("home", HomeViewSet, basename="home")
 
 urlpatterns = [
     # TODO Next Step: Investigate whether to enable Admin URLs
     # path("admin/", admin.site.urls),
-    path("home", HomeViewSet.as_view(), name="home"),
+    re_path(r"", include(router.urls)),
 ]
