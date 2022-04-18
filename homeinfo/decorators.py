@@ -19,3 +19,7 @@ def api_view_requires_query_param(*required_query_keys: str):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return func(self, request, *args, **kwargs)
+
+        return func_wrapper
+
+    return decorator
