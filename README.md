@@ -26,7 +26,16 @@ Get information about homes!
 ```
 6. Install Requirements Plugin: PyCharm > Preferences > Plugins > MarketPlace > Requirements
 
-
 ## Run the Server
 
 `python3 manage.py runserver 0.0.0.0:8000`
+
+# Next Steps
+
+- [Dockerize the Project](https://docs.docker.com/samples/django/). Note that the Docket-Django QuickStart guide isn't working out of the gate. `bento-compose up` fails with the exception: `ModuleNotFoundError: No module named 'homeinfo'`.
+- [Generate a Secret for Production](https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/)
+- [Hookup a Database](https://docs.djangoproject.com/en/3.2/ref/settings/#databases)
+- [Create separate Django apps if we intend to have multiple services in the app](https://docs.djangoproject.com/en/4.0/intro/tutorial01/#creating-the-polls-app)
+- [Add Access Policy if we want different levels of permissions for different users](https://github.com/rsinger86/drf-access-policy)
+- [Setup CORS for more security](https://github.com/adamchainz/django-cors-headers)
+- [Investigate Admin URLs](https://docs.djangoproject.com/en/4.0/ref/contrib/admin/)
