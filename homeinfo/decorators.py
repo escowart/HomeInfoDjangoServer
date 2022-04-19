@@ -35,7 +35,7 @@ def api_view_requires_query_param(*required_query_keys: str):
         @wraps(func)
         def func_wrapper(self, request: Request, *args, **kwargs) -> Response:
             missing_keys = [
-                key for key in required_query_keys if key in request.query_params
+                key for key in required_query_keys if key not in request.query_params
             ]
             if len(missing_keys) > 0:
                 return Response(
