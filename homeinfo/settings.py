@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 
 HOUSE_CANARY_API_URL = "https://api.housecanary.com/v2/"
-
+HOUSE_CANARY_TIMEOUT_S = 60
 
 # Application definition
 
