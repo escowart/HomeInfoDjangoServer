@@ -34,9 +34,12 @@ def api_view_requires_query_param(*required_query_keys: str):
     def decorator(func):
         @wraps(func)
         def func_wrapper(self, request: Request, *args, **kwargs) -> Response:
-            for key in required_query_keys:
+            missing_keys = [
+                key for key in required_query_keys if key in request.query_params
+            ]
+            if len(missing_keys) > 0:
                 return Response(
-                    f"Missing require query param: ${key}",
+                    f"Missing require query param(s): {missing_keys}",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return func(self, request, *args, **kwargs)
