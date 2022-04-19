@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["0.0.0.0"]
 
-
+SUPPORT_PHONE_NUMBER = "1-800-123-5678"
 HOUSE_CANARY_API_URL = "https://api.housecanary.com/v2/"
 HOUSE_CANARY_TIMEOUT_S = 60
 

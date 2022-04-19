@@ -8,7 +8,7 @@ from django.conf import settings
 import requests  # Import has to be structured this way for the unittest to work
 
 from homeinfo.services.logging import log_exception
-from homeinfo.utility import HTTPMethod, NonDBModel
+from homeinfo.services.utility import HTTPMethod, NonDBModel
 
 
 def _make_house_canary_api_request(
