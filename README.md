@@ -39,3 +39,4 @@ Get information about homes!
 - [Add Access Policy if we want different levels of permissions for different users](https://github.com/rsinger86/drf-access-policy)
 - [Setup CORS for more security](https://github.com/adamchainz/django-cors-headers)
 - [Investigate Admin URLs](https://docs.djangoproject.com/en/4.0/ref/contrib/admin/)
+- Integrate error monitoring service

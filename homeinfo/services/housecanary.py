@@ -2,18 +2,18 @@
 Author: Edwin S. Cowart
 Created: 4/17/22
 """
-from typing import Tuple, Optional, TypedDict, Literal, Union
+from typing import Tuple, Optional, Literal, Union
 
 from django.conf import settings
-from requests import Response, request
-from requests.exceptions import RequestException
+import requests  # Import has to be structured this way for the unittest to work
 
-from homeinfo.requests import HTTPMethod, NonDBModel
+from homeinfo.services.logging import log_exception
+from homeinfo.utility import HTTPMethod, NonDBModel
 
 
 def _make_house_canary_api_request(
     method: HTTPMethod, route: str, params: Optional[dict]
-) -> Tuple[Response, Optional[RequestException]]:
+) -> Tuple[requests.Response, Optional[requests.exceptions.RequestException]]:
     """
     :param method: HTTP method
     :param route: House Canary route
@@ -22,7 +22,7 @@ def _make_house_canary_api_request(
              Error:   (Response, Exception)
     """
     try:
-        response = request(
+        response = requests.request(
             method=method,
             url=f"{settings.HOUSE_CANARY_API_URL}/{route}",
             params=params,
@@ -30,7 +30,7 @@ def _make_house_canary_api_request(
         )
         response.raise_for_status()
         return response, None
-    except RequestException as e:
+    except requests.exceptions.RequestException as e:
         return e.response, e
 
 
@@ -47,18 +47,22 @@ class PropertyDetails(NonDBModel):
 
 
 def get_property_details(
-    address: str,
-) -> Union[Tuple[PropertyDetails, None], Tuple[None, RequestException]]:
+    address: str, zipcode: str
+) -> Union[Tuple[PropertyDetails, None], Tuple[None, requests.RequestException]]:
     """Get property details
-    :param address: Address as a single line string
+    :param address: Single line address
+    :param zipcode: Zip code
     :return: Success: (Response, Property, None)
              Error:   (Response, None, Exception)
     """
     # https://api-docs.housecanary.com/#property-details
     response, exception = _make_house_canary_api_request(
-        method="get", route="property/details", params={"address": address}
+        method="get",
+        route="property/details",
+        params={"address": address, "zipcode": zipcode},
     )
     if exception:
+        log_exception(exception)
         return None, exception
 
     property_details_data = response.json()["property/details"]["result"]["property"]

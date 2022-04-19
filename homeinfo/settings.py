@@ -20,12 +20,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure 174wpxl^smhc0m!j4k@n7q*ffnhfv=k_jqmei$tdf4nf!^$ybl"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["0.0.0.0"]
 
 
 HOUSE_CANARY_API_URL = "https://api.housecanary.com/v2/"
@@ -74,7 +76,13 @@ WSGI_APPLICATION = "homeinfo.wsgi.application"
 
 
 # TODO Add Database - https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
+# Database required to run tests
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "mydatabase",
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
