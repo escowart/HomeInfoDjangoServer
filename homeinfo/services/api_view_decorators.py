@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from homeinfo.services.utility import format_in_english
+from homeinfo.services.string_utility import format_in_english
 
 
 def api_view_except_all():

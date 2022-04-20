@@ -10,8 +10,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
-from homeinfo.decorators import api_view_requires_query_param, api_view_except_all
-from homeinfo.services.housecanary import get_property_details, is_septic
+from homeinfo.services.api_view_decorators import (
+    api_view_requires_query_param,
+    api_view_except_all,
+)
+from homeinfo.services.house_canary import get_property_details, is_septic
 
 
 class HomeViewSet(GenericViewSet, APIView):

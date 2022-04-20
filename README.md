@@ -32,7 +32,7 @@ Get information about homes!
 
 ## Run Tests
 
-``
+`python3 manage.py test homeinfo/tests`
 
 # Next Steps
 

@@ -6,7 +6,7 @@ import logging
 from unittest.mock import patch
 from django.test import TestCase, Client
 
-from homeinfo.services.housecanary import get_property_details
+from homeinfo.services.house_canary import get_property_details
 
 
 class HomeSewerTestCase(TestCase):
@@ -14,7 +14,7 @@ class HomeSewerTestCase(TestCase):
         """Run administrative tasks."""
         self.client = Client()
 
-    @patch("homeinfo.services.housecanary.requests.request")
+    @patch("homeinfo.services.house_canary.requests.request")
     def test_home_sewer_success(self, mock_request):
         # TODO - Next Step - Find a better way to parameterize a test
         cases = (
@@ -142,7 +142,7 @@ class HomeSewerTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), expected_json_response)
 
-    @patch("homeinfo.services.housecanary.requests.request")
+    @patch("homeinfo.services.house_canary.requests.request")
     def test_contract_violation_from_service(self, mock_request):
         # Define response data for my Mock object
         mock_request.return_value.status_code = 200
