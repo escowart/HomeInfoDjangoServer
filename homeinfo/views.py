@@ -25,6 +25,7 @@ class HomeViewSet(GenericViewSet, APIView):
     @api_view_requires_query_param("address", "zipcode")
     @action(methods=["get"], detail=False)
     def septic(self, request: Request, *args, **kwargs) -> Response:
+        # TODO Next Steps - Validate inbound data, so we don't waste resources or $$$ with a call to an external service
         property_details, exception = get_property_details(
             address=request.query_params["address"],
             zipcode=request.query_params["zipcode"],

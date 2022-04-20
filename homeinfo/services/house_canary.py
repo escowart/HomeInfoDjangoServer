@@ -2,10 +2,10 @@
 Author: Edwin S. Cowart
 Created: 4/17/22
 """
-from typing import Tuple, Optional, Literal, Union, TypedDict
 import logging
+import requests  # Import has to be structured this way for unittest.mock.patch
+from typing import Tuple, Optional, Literal, Union, TypedDict
 from django.conf import settings
-import requests  # Import has to be structured this way for the unittest to work
 
 HTTPMethod = Literal["get", "options", "head", "post", "put", "patch", "delete"]
 
@@ -66,6 +66,6 @@ def get_property_details(
         return None, exception
 
     # TODO Next Step consider capturing contract violations here instead of allowing the exception to
-    #  propagate down the stack
+    #  propagate down the call stack
     property_details = response.json()["property/details"]["result"]["property"]
     return property_details, None

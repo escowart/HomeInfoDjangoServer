@@ -30,13 +30,63 @@ Get information about homes!
 
 `python3 manage.py runserver 0.0.0.0:8000`
 
+The server can be accessed by making requests to `http://0.0.0.0:8000`
+
+## Available APIs
+
+Summary: Does the given address have a septic tank for sewage?
+
+Method: `GET`
+
+Path: `home/septic`
+
+Content Type: `application/json`
+
+Authorization: `None`
+
+Query Params
+
+   - `address`
+     - Type: string
+     - Required: True
+     - Example: "123+Main+St"
+   
+   - `zipcode`
+     - Type: string
+     - Required: True
+     - Example: "20500"
+
+Responses
+
+   - `200`
+     - Scenario: Call to House Canary succeeded
+     - Body
+       - Type: boolean
+       - Example: True
+   - `401`
+     - Scenario: Missing Required Query Parameter
+     - Body:
+       - Type: string
+       - Example: "Missing require query params: address and zipcode"
+   - `500`
+     - Scenario: Internal Server Error
+     - Body:
+       - Type: string
+       - Example: "Oops! something went wrong. Please contact us for assistance at 1-800-123-5678!"
+   - `503`
+     - Scenario: Call to House Canary Failed
+     - Body:
+       - Type: string
+       - Example: "Oops! something went wrong with our home info service. Please contact us for assistance at 1-800-123-5678!"
+
+
 ## Run Tests
 
 `python3 manage.py test homeinfo/tests`
 
 # Next Steps
 
-- [Dockerize the Project](https://docs.docker.com/samples/django/). Note that the Docket-Django QuickStart guide isn't working out of the gate. `bento-compose up` fails with the exception: `ModuleNotFoundError: No module named 'homeinfo'`.
+- [Dockerize the Project](https://docs.docker.com/samples/django/). Note that the Docket-Django QuickStart guide isn't working out of the gate. `docker-compose up` fails with the exception: "ModuleNotFoundError: No module named 'homeinfo'".
 - [Generate a Secret for Production](https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/)
 - [Hookup a Database](https://docs.djangoproject.com/en/3.2/ref/settings/#databases)
 - [Create separate Django apps if we intend to have multiple services in the app](https://docs.djangoproject.com/en/4.0/intro/tutorial01/#creating-the-polls-app)
@@ -45,3 +95,5 @@ Get information about homes!
 - [Investigate Admin URLs](https://docs.djangoproject.com/en/4.0/ref/contrib/admin/)
 - Integrate error monitoring service
 - Investigate parameterizing tests & disabling logging if the test passes (Both features supported by pytest)
+- Validate inbound data, so we don't waste resources or $$$ with a call to an external service
+- Capturing contract violations at the service level rather than allowing the exception to propagate down the call stack
