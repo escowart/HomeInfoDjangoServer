@@ -2,13 +2,12 @@
 Author: Edwin S. Cowart
 Created: 4/17/22
 """
-from typing import Tuple, Optional, Literal, Union
-
+from typing import Tuple, Optional, Literal, Union, TypedDict
+import logging
 from django.conf import settings
 import requests  # Import has to be structured this way for the unittest to work
 
-from homeinfo.services.logging import log_exception
-from homeinfo.services.utility import HTTPMethod, NonDBModel
+HTTPMethod = Literal["get", "options", "head", "post", "put", "patch", "delete"]
 
 
 def _make_house_canary_api_request(
@@ -38,12 +37,12 @@ def _make_house_canary_api_request(
 Sewer = Literal["Municipal", "None", "Storm", "Septic", "Yes"]
 
 
-class PropertyDetails(NonDBModel):
+class PropertyDetails(TypedDict):
     sewer: Sewer
 
-    @property
-    def is_septic(self) -> bool:
-        return self.sewer.casefold() == "Septic".casefold()
+
+def is_septic(property_details: PropertyDetails) -> bool:
+    return property_details["sewer"].casefold() == "Septic".casefold()
 
 
 def get_property_details(
@@ -62,8 +61,11 @@ def get_property_details(
         params={"address": address, "zipcode": zipcode},
     )
     if exception:
-        log_exception(exception)
+        # TODO Next Step log exception to exception monitoring service
+        logging.exception(exception, stack_info=True)
         return None, exception
 
-    property_details_data = response.json()["property/details"]["result"]["property"]
-    return PropertyDetails(**property_details_data), None
+    # TODO Next Step consider capturing contract violations here instead of allowing the exception to
+    #  propagate down the stack
+    property_details = response.json()["property/details"]["result"]["property"]
+    return property_details, None

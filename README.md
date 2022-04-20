@@ -26,9 +26,13 @@ Get information about homes!
 ```
 6. Install Requirements Plugin: PyCharm > Preferences > Plugins > MarketPlace > Requirements
 
-## Run the Server
+## Run Server
 
 `python3 manage.py runserver 0.0.0.0:8000`
+
+## Run Tests
+
+``
 
 # Next Steps
 

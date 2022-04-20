@@ -2,6 +2,7 @@
 Author: Edwin S. Cowart
 Created: 4/17/22
 """
+import logging
 from functools import wraps
 
 from django.conf import settings
@@ -9,7 +10,7 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from homeinfo.services.logging import log_exception
+from homeinfo.services.utility import format_in_english
 
 
 def api_view_except_all():
@@ -19,9 +20,14 @@ def api_view_except_all():
             try:
                 return func(self, request, *args, **kwargs)
             except Exception as e:
-                log_exception(e)
+                # TODO Next Step log exception to exception monitoring service
+                logging.exception(e, stack_info=True)
+                message = (
+                    "Oops! something went wrong. "
+                    f"Please contact us for assistance at {settings.SUPPORT_PHONE_NUMBER}!"
+                )
                 return Response(
-                    f"Oops! something went wrong. Please contact us for assistance at ${settings.SUPPORT_PHONE_NUMBER}!",
+                    message,
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
@@ -37,9 +43,10 @@ def api_view_requires_query_param(*required_query_keys: str):
             missing_keys = [
                 key for key in required_query_keys if key not in request.query_params
             ]
-            if len(missing_keys) > 0:
+            count = len(missing_keys)
+            if count > 0:
                 return Response(
-                    f"Missing require query param(s): {missing_keys}",
+                    f"Missing require query param{'s'[0:count-1]}: {format_in_english(missing_keys, 'and')}",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return func(self, request, *args, **kwargs)
