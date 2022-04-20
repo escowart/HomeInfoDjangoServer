@@ -44,3 +44,4 @@ Get information about homes!
 - [Setup CORS for more security](https://github.com/adamchainz/django-cors-headers)
 - [Investigate Admin URLs](https://docs.djangoproject.com/en/4.0/ref/contrib/admin/)
 - Integrate error monitoring service
+- Investigate parameterizing tests & disabling logging if the test passes (Both features supported by pytest)
