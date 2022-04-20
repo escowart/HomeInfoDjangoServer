@@ -1,4 +1,4 @@
-# HomeInfoDjangoServer
+# Home Info Django Server
 
 Get information about homes!
 
