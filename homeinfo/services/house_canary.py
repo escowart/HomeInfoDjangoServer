@@ -4,50 +4,76 @@ Created: 4/17/22
 """
 import logging
 import requests  # Import has to be structured this way for unittest.mock.patch
-from typing import Tuple, Optional, Literal, Union, TypedDict
+from typing import Tuple, Optional, Literal, Union, TypeVar
 from django.conf import settings
 
 HTTPMethod = Literal["get", "options", "head", "post", "put", "patch", "delete"]
 
+T = TypeVar('T')
 
-def _make_house_canary_api_request(
-    method: HTTPMethod, route: str, params: Optional[dict]
-) -> Tuple[requests.Response, Optional[requests.exceptions.RequestException]]:
+
+def _get_property_attribute_from_house_canary_api(
+        attribute: str, params: Optional[dict]
+) -> Union[Tuple[T, None], Tuple[None, Exception]]:
     """
-    :param method: HTTP method
-    :param route: House Canary route
+    Get property attribute from the House Canary API
+    :param attribute: property attribute
     :param params: Query params
     :return: Success: (Response, None)
-             Error:   (Response, Exception)
+             Error:   (None, Exception)
     """
     try:
-        response = requests.request(
-            method=method,
-            url=f"{settings.HOUSE_CANARY_API_URL}/{route}",
+        response = requests.get(
+            url=f"{settings.HOUSE_CANARY_API_URL}/property/{attribute}",
             params=params,
             timeout=settings.HOUSE_CANARY_TIMEOUT_S,
         )
         response.raise_for_status()
-        return response, None
-    except requests.exceptions.RequestException as e:
-        return e.response, e
+        # https://api-docs.housecanary.com/#property-census
+        # If you view the House Canaray API documentation, you'll see that requests to fetch property attributes
+        # have a standard response structure
+        result = response.json()[f"property/{attribute}"]["result"]
+        return result, None
+    except (requests.exceptions.RequestException, TypeError, KeyError) as e:
+        # TODO Next Step log exception to exception monitoring service
+        logging.exception(e, stack_info=True)
+        # RequestException when:
+        #   - Timeout
+        #   - Connection/Session issue
+        #   - Response isn't JSON
+        #   - Response is 400/500-series
+        # ValueError when:
+        #   - Response JSON is missing a key
+        return None, e
 
 
 # NOTE API doc is inconsistent about capitalization. Be sure to casefold when doing comparisons.
+# TODO Next Step - Investigate converting str -> Enum & Enum validation
 Sewer = Literal["Municipal", "None", "Storm", "Septic", "Yes"]
 
 
-class PropertyDetails(TypedDict):
+class PropertyDetails:
+    # Other attributes are omitted because they are unused
     sewer: Sewer
 
+    # TODO Next Step - Create a non-DB object deserializer
+    def __init__(self, **kwargs):
+        self.sewer = kwargs.get("sewer")
+        self._validate()
 
-def is_septic(property_details: PropertyDetails) -> bool:
-    return property_details["sewer"].casefold() == "Septic".casefold()
+    def _validate(self):
+        if not isinstance(self.sewer, str):
+            raise TypeError("Sewer must be a string")
+        # TODO Next Step - Validate the sewer value is part of the expected enum
+
+    @property
+    def is_septic(self) -> bool:
+        return self.sewer.casefold() == "Septic".casefold()
 
 
 def get_property_details(
     address: str, zipcode: str
-) -> Union[Tuple[PropertyDetails, None], Tuple[None, requests.RequestException]]:
+) -> Union[Tuple[PropertyDetails, None], Tuple[None, Exception]]:
     """Get property details
     :param address: Single line address
     :param zipcode: Zip code
@@ -55,17 +81,15 @@ def get_property_details(
              Error:   (Response, None, Exception)
     """
     # https://api-docs.housecanary.com/#property-details
-    response, exception = _make_house_canary_api_request(
-        method="get",
-        route="property/details",
+    result, exception = _get_property_attribute_from_house_canary_api(
+        attribute="details",
         params={"address": address, "zipcode": zipcode},
     )
     if exception:
-        # TODO Next Step log exception to exception monitoring service
-        logging.exception(exception, stack_info=True)
         return None, exception
 
-    # TODO Next Step consider capturing contract violations here instead of allowing the exception to
-    #  propagate down the call stack
-    property_details = response.json()["property/details"]["result"]["property"]
-    return property_details, None
+    try:
+        property_details = PropertyDetails(**result["property"])
+        return property_details, None
+    except (TypeError, KeyError) as e:
+        return None, e

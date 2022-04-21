@@ -14,7 +14,7 @@ from homeinfo.services.api_view_decorators import (
     api_view_requires_query_param,
     api_view_except_all,
 )
-from homeinfo.services.house_canary import get_property_details, is_septic
+from homeinfo.services.house_canary import get_property_details
 
 
 class HomeViewSet(GenericViewSet, APIView):
@@ -31,7 +31,7 @@ class HomeViewSet(GenericViewSet, APIView):
             zipcode=request.query_params["zipcode"],
         )
         if property_details:
-            return Response(is_septic(property_details))
+            return Response(property_details.is_septic)
         elif exception:
             message = (
                 "Oops! something went wrong with our home info service. "

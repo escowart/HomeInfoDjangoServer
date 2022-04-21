@@ -14,7 +14,7 @@ class HomeSewerTestCase(TestCase):
         """Run administrative tasks."""
         self.client = Client()
 
-    @patch("homeinfo.services.house_canary.requests.request")
+    @patch("homeinfo.services.house_canary.requests.get")
     def test_home_sewer_success(self, mock_request):
         # TODO - Next Step - Find a better way to parameterize a test
         cases = (
@@ -23,11 +23,11 @@ class HomeSewerTestCase(TestCase):
             ("Municipal", False),
             ("municipal", False),
         )
-        for sewer, expected_response_json in cases:
-            self._test_home_sewer_success(mock_request, sewer, expected_response_json)
+        for sewer, is_septic in cases:
+            self._test_home_sewer_success(mock_request, sewer, is_septic)
 
     def _test_home_sewer_success(
-        self, mock_request, sewer: str, expected_response_json: bool
+        self, mock_request, sewer: str, is_septic: bool
     ):
         # Define response data for my Mock object
         mock_request.return_value.status_code = 200
@@ -86,14 +86,15 @@ class HomeSewerTestCase(TestCase):
             address="123+Main+St", zipcode="20500"
         )
         self.assertIsNotNone(property_details)
-        self.assertEqual(property_details["sewer"], sewer)
+        self.assertEqual(property_details.sewer, sewer)
+        self.assertEqual(property_details.is_septic, is_septic)
         self.assertIsNone(exception)
 
         response = self.client.get(
             f"/home/septic", {"address": "123+Main+St", "zipcode": "20500"}, follow=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), expected_response_json)
+        self.assertEqual(response.json(), is_septic)
 
     def test_home_sewer_test_live_url(self):
         # Test live URL which will return a 401 Client Error: UNAUTHORIZED
@@ -142,12 +143,28 @@ class HomeSewerTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), expected_json_response)
 
-    @patch("homeinfo.services.house_canary.requests.request")
+    @patch("homeinfo.services.house_canary.requests.get")
     def test_contract_violation_from_service(self, mock_request):
+        cases = (
+            "Contract Violation",
+            {"another-one": "another-one"},
+            {
+                "property/details": {"result": "Contract Violation"}
+            },
+            {
+                "property/details": {"result": {
+                    "sewer": 123
+                }}
+            }
+        )
+        for case in cases:
+            self._test_contract_violation_from_service(mock_request, case)
+
+    def _test_contract_violation_from_service(self, mock_request, response_json_property_details: dict):
         # Define response data for my Mock object
         mock_request.return_value.status_code = 200
         mock_request.return_value.json.return_value = {
-            "property/details": "Contract Violation"
+            "property/details": response_json_property_details
         }
         # TODO - Next Steps - Investigate how to disable logging if a test succeeds
         logging.disable()
@@ -156,8 +173,8 @@ class HomeSewerTestCase(TestCase):
         )
         logging.disable(False)
         message = (
-            "Oops! something went wrong. "
+            "Oops! something went wrong with our home info service. "
             "Please contact us for assistance at 1-800-123-5678!"
         )
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json(), message)
