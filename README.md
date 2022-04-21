@@ -26,11 +26,16 @@ Get information about homes!
 ```
 6. Install Requirements Plugin: PyCharm > Preferences > Plugins > MarketPlace > Requirements
 
-## Run Server
+## Run Development Server
 
 `python3 manage.py runserver 0.0.0.0:8000`
 
-The server can be accessed by making requests to `http://0.0.0.0:8000`
+The development server can then be accessed at `http://0.0.0.0:8000`
+
+## Run Tests
+
+`python3 manage.py test homeinfo/tests`
+
 
 ## Available APIs
 
@@ -80,20 +85,22 @@ Responses
        - Example: "Oops! something went wrong with our home info service. Please contact us for assistance at 1-800-123-5678!"
 
 
-## Run Tests
-
-`python3 manage.py test homeinfo/tests`
-
 # Next Steps
 
 - [Dockerize the Project](https://docs.docker.com/samples/django/). Note that the Docket-Django QuickStart guide isn't working out of the gate. `docker-compose up` fails with the exception: "ModuleNotFoundError: No module named 'homeinfo'".
-- [Generate a Secret for Production](https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/)
-- [Hookup a Database](https://docs.djangoproject.com/en/3.2/ref/settings/#databases)
+- [Checklist for Django Deployment to Production](https://docs.djangoproject.com/en/4.0/howto/deployment/)
+- Research & Integrate an off-premise logging and error monitoring service
+- [Remove development dependencies from requirements.txt](https://stackoverflow.com/questions/63836220/creating-a-requirements-txt-without-development-dependencies) during the production/QA build process
+- [Hookup separate environment files for: dev, qa, prod (maybe demo as well)](https://medium.com/@mateo.cobanov/using-multiple-env-files-in-django-1a4390b4762c). Production environment keys will never be committed to version control.
+- Turn off DEBUG in settings.py for production.
+- [Generate a new Django Secret for production](https://humberto.io/blog/tldr-generate-django-secret-key/). DO NOT add to version control.
+- [Hookup a Gunicorn, Nginx, & HTTPS](https://realpython.com/django-nginx-gunicorn/) for load balancing & additional security
+- [Hookup a Database](https://docs.djangoproject.com/en/4.0/ref/settings/#databases)
+- [Hookup a Cache to reduce the number of requests to the Home Canary API](https://docs.djangoproject.com/en/4.0/topics/cache/)
 - [Create separate Django apps if we intend to have multiple services in the app](https://docs.djangoproject.com/en/4.0/intro/tutorial01/#creating-the-polls-app)
 - [Add Access Policy if we want different levels of permissions for different users](https://github.com/rsinger86/drf-access-policy)
 - [Setup CORS for more security](https://github.com/adamchainz/django-cors-headers)
 - [Investigate Admin URLs](https://docs.djangoproject.com/en/4.0/ref/contrib/admin/)
-- Integrate error monitoring service
-- Investigate parameterizing tests & disabling logging if the test passes (Both features supported by pytest)
+- Investigate parameterizing tests & disabling logging if the test passes (Both features are supported by pytest)
 - Validate inbound data, so we don't waste resources or $$$ with a call to an external service
 - Capturing contract violations at the service level rather than allowing the exception to propagate down the call stack
