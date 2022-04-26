@@ -99,7 +99,6 @@ Responses
 - [Hookup a Cache to reduce the number of requests to the Home Canary API](https://docs.djangoproject.com/en/4.0/topics/cache/)
 - [Create separate Django apps if we intend to have multiple services in the app](https://docs.djangoproject.com/en/4.0/intro/tutorial01/#creating-the-polls-app)
 - [Add Access Policy if we want different levels of permissions for different users](https://github.com/rsinger86/drf-access-policy)
-- [Setup CORS for more security](https://github.com/adamchainz/django-cors-headers)
 - [Investigate Admin URLs](https://docs.djangoproject.com/en/4.0/ref/contrib/admin/)
 - Investigate parameterizing tests & disabling logging if the test passes (Both features are supported by pytest)
 - Validate inbound data, so we don't waste resources or $$$ with a call to an external service
