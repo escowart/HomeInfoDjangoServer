@@ -68,7 +68,7 @@ Responses
      - Body
        - Type: boolean
        - Example: True
-   - `401`
+   - `400`
      - Scenario: Missing Required Query Parameter
      - Body:
        - Type: string
@@ -103,4 +103,3 @@ Responses
 - [Investigate Admin URLs](https://docs.djangoproject.com/en/4.0/ref/contrib/admin/)
 - Investigate parameterizing tests & disabling logging if the test passes (Both features are supported by pytest)
 - Validate inbound data, so we don't waste resources or $$$ with a call to an external service
-- Capturing contract violations at the service level rather than allowing the exception to propagate down the call stack
